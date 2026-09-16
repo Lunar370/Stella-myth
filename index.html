@@ -404,7 +404,7 @@ kbd { font-family: ui-monospace, monospace; font-size: 12px; padding: 0 5px; bor
 .ucard.rep.lvok { box-shadow: 0 0 22px rgba(255,210,70,.6), 0 0 0 3px rgba(127,231,255,.55); }
 
 /* Tabs & achievements */
-.tabs { position: sticky; top: 0; z-index: 30; display: flex; gap: 6px; margin: -28px -28px 18px; padding: 14px 28px 10px;
+.tabs { position: sticky; top: -28px; z-index: 30; display: flex; gap: 6px; margin: -28px -28px 18px; padding: 14px 28px 10px;
   background: linear-gradient(rgba(8,8,24,.96), rgba(8,8,24,.85)); border-bottom: 1px solid var(--border); }
 .tab { font-family: var(--f-body); font-size: 15px; color: var(--text-mid); background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 8px 16px; cursor: pointer; }
 .tab:hover { color: var(--text); background: rgba(155,109,255,.1); }
@@ -603,6 +603,7 @@ kbd { font-family: ui-monospace, monospace; font-size: 12px; padding: 0 5px; bor
   .pl { border-right: none; border-bottom: 1px solid var(--border); overflow: visible; }
   .pr { border-left: none; border-top: 1px solid var(--border); overflow: visible; }
   .pc { overflow: visible; }
+  .tabs { top: 0; flex-wrap: wrap; }
   .ugrid { grid-template-columns: repeat(auto-fill, minmax(110px,1fr)); }
 }
 </style>
@@ -1021,7 +1022,7 @@ const DUPG = [
   { id:'d0', name:'영속의 별자리', icon:'🏛️', dc:1,  desc:'사냥꾼자리 · 올림포스자리를 완성한 채로 시작 (구매 즉시 적용)',
     e:s=>s.startAB=true, info:()=>`사냥꾼자리 · 올림포스자리 <b>완성</b> → 생산 ×2 · 클릭 ×2 · 비용 −20% · 최대 구매` },
   { id:'d1', name:'계승된 기억',   icon:'📿', dc:1,  desc:'신화 회귀 후 성흔 10개를 가진 채 시작',
-    e:s=>s.startSig=10, onBuy:()=>{ G.sig += 10; G.totSig += 10; }, info:()=>`시작 성흔 0 → <b>10</b>` },
+    e:s=>s.startSig=10, info:()=>`시작 성흔 0 → <b>10</b>` },
   { id:'d2', name:'자동 소환',     icon:'🤖', dc:1,  desc:'매초 업그레이드를 자동으로 최대 구매',
     e:s=>s.autoBuy=true, info:()=>`매초 <b>최대 구매</b> (가격순 순차 구매)` },
   { id:'d3', name:'천상의 문',     icon:'⛩️', dc:2,  desc:'천상과 명계자리도 완성한 채로 시작 (구매 즉시 적용)',
@@ -1065,27 +1066,37 @@ const DUPG_TIERS = [['d0'], ['d1','d2','d3'], ['d4','d5'], ['d6','d7'], ['d8','d
 // 신화 회귀·시작 보유 등에서 쓰는 '현재 필요한 성흔 소환' (무한의 성좌는 해금했을 때만 포함)
 const suReq = () => SUPG.filter(u => !u.plus2 && (!u.plus || G.suPlus));
 const suLv = id => G.suLv[id] || 1;
-const suLvCost = u => Math.ceil(scost(u) * Math.pow(5, suLv(u.id)));   // 다음 레벨 비용
+const suLvCost = u => Math.ceil(scost(u) * Math.pow(20, suLv(u.id)));
+// 성흔의 반복: 2레벨부터는 효과가 절반 강도로 적용 (곱 효과는 √, 합 효과는 ½)
+const SU_LV_F = 0.5;
+const SU_MULT = new Set(['gm','cd','interestM','mythM','spd','prodExp','pm','dm','heraRate','cg','aem']);
+const SU_INT = ['twin','upRep','pa'];
+function applyPartial(u, s, f) {
+  const snap = {}; for (const k in s) if (typeof s[k] === 'number') snap[k] = s[k];
+  u.e(s);
+  for (const k in snap) { const a = snap[k], b = s[k]; if (typeof b !== 'number' || a === b) continue;
+    s[k] = (SU_MULT.has(k) && a > 0 && b > 0) ? a * Math.pow(b / a, f) : a + (b - a) * f; }
+}   // 다음 레벨 비용
 
 // ── 신들의 시련 ─────────────────────────
 const TRIALS = [
   { id:'luna',   god:'루나',     icon:'🌙', name:'달의 시련',   quote:'오직 가장 작은 빛만으로 하늘을 채워 보아라.',
-    rule:'유성만 구매할 수 있습니다',                 goal:'1e1200',   reward:'유성 생산 ×1e10',
+    rule:'유성만 구매할 수 있습니다',                 goal:'1e1150',   reward:'유성 생산 ×1e10',
     re:s=>{ s.bm[0]*=1e10; } },
   { id:'solar',  god:'솔라',     icon:'☀️', name:'태양의 시련', quote:'신의 권능 없이, 스스로 타오를 수 있겠느냐.',
-    rule:'신격 권능이 모두 비활성화됩니다',            goal:'1e1000',   reward:'신격 획득 ×10',
+    rule:'신격 권능이 모두 비활성화됩니다',            goal:'1e830',   reward:'신격 획득 ×10',
     re:s=>{ s.dm*=10; } },
   { id:'astra',  god:'아스트라', icon:'⭐', name:'별의 시련',   quote:'성흔에 기대지 말고 별을 모아라.',
-    rule:'성흔 소환이 모두 비활성화됩니다 (신화 회귀는 성흔 소환 없이 가능)', goal:'1e700',    reward:'성흔 획득 ×100',
+    rule:'성흔 소환이 모두 비활성화됩니다 (신화 회귀는 성흔 소환 없이 가능)', goal:'1e710',    reward:'성흔 획득 ×100',
     re:s=>{ s.pm*=100; } },
   { id:'hera',   god:'헤라',     icon:'⏳', name:'인내의 시련', quote:'모든 것이 느려진 세계에서 버텨 보아라.',
-    rule:'초당 생산량이 0.5제곱으로 줄어듭니다',        goal:'1e30',     reward:'생산 지수 +0.05',
+    rule:'초당 생산량이 0.5제곱으로 줄어듭니다',        goal:'1e855',     reward:'생산 지수 +0.05',
     re:s=>{ s.texp+=.05; } },
   { id:'chaos',  god:'카오스',   icon:'🌀', name:'혼돈의 시련', quote:'별자리도, 자동의 손길도 없는 혼돈을 건너라.',
-    rule:'별자리 소환 효과와 자동 구매가 비활성화됩니다', goal:'1e1200',   reward:'모든 생산 ×1e50',
+    rule:'별자리 소환 효과와 자동 구매가 비활성화됩니다', goal:'1e1130',   reward:'모든 생산 ×1e50',
     re:s=>{ s.xlog+=50; } },
   { id:'cosmos', god:'코스모스', icon:'🌌', name:'우주의 시련', quote:'영겁의 힘을 내려놓고 다시 무한에 닿아라.',
-    rule:'영겁 권능이 모두 비활성화됩니다',            goal:'1e60',     reward:'환생 시 영겁 획득 ×3',
+    rule:'영겁 권능이 모두 비활성화됩니다',            goal:'1e1090',     reward:'환생 시 영겁 획득 ×3',
     re:s=>{ s.aem*=3; } },
 ];
 const trialDoneN = () => TRIALS.filter(t => (G.trialDone || {})[t.id]).length;
@@ -1125,6 +1136,9 @@ const SHAPES = [
   { id:'ring', name:'큰 고리',   desc:'별 6개 이상으로 닫힌 고리 → 봉헌 시 호의 획득 ×2' },
 ];
 const FAV_MAX = 10;
+const OFFER_CD = 600;    // 공물 쿨타임 (신마다, 실제 시간 초)
+const OFFER_CAP = 0.2;   // 공물 1회 호의 상한: 현재 레벨 필요량의 20%
+const fmtCd = t => t >= 60 ? Math.ceil(t / 60) + '분' : Math.ceil(t) + '초';
 const xpNeed = lv => 60 * Math.pow(2, lv);                      // 다음 레벨까지 필요한 호의
 const favLv = id => (G.fav && G.fav[id] ? G.fav[id].lv : 0);
 const favSum = () => GODS.reduce((a, g) => a + favLv(g.id), 0);
@@ -1301,8 +1315,8 @@ const AUPG = [
   { id:'a11', name:'신격의 잔재', icon:'🪬', ac:1,  desc:'환생할 때마다 신격 권능을 앞에서부터 환생 횟수만큼 유지 (2회 환생 시 2개)',
     e:s=>s.startDv=Math.max(s.startDv, Math.min(15, s.rc)), info:()=>`환생 ${fmt(G.rc)}회 → 신격 권능 <b>${Math.min(15, G.rc)}개</b> 유지` },
   // 2단계
-  { id:'a1',  name:'성흔의 반복', icon:'🔁', ac:2,  desc:'이미 산 성흔 소환을 여러 번 강화할 수 있음 (레벨이 오를 때마다 효과가 한 번 더 적용)',
-    e:s=>s.suRepeat=true, info:()=>`성흔 소환 <b>레벨 강화</b> 해금 · 비용은 레벨마다 ×5` },
+  { id:'a1',  name:'성흔의 반복', icon:'🔁', ac:2,  desc:'이미 산 성흔 소환을 여러 번 강화할 수 있음 (레벨이 오를 때마다 효과가 절반 강도로 한 번 더 적용)',
+    e:s=>s.suRepeat=true, info:()=>`성흔 소환 <b>레벨 강화</b> 해금 · 2레벨부터 효과 절반 · 비용은 레벨마다 ×20` },
   { id:'a2',  name:'심연의 문',   icon:'🚪', ac:2,  desc:'새 업그레이드 은하단 · 우주 · 차원 해금',
     e:s=>s.bldPlus=true, info:()=>`업그레이드 <b>은하단 · 우주 · 차원</b> 해금` },
   { id:'a3',  name:'새로운 별자리', icon:'🌠', ac:3, desc:'별자리 소환에 「차원자리」 추가',
@@ -1346,10 +1360,12 @@ function applyStartBuildings() {
   }
   if (G.startDv || G.startSu) {  // 영겁 권능: 신격 권능 / 성흔 소환을 가진 채 시작
     let ch = false;
-    DUPG.slice(0, G.startDv).forEach(u => { if (!G.dv[u.id]) { G.dv[u.id] = 1; if (u.onBuy) u.onBuy(); ch = true; } });
+    DUPG.slice(0, G.startDv).forEach(u => { if (!G.dv[u.id]) { G.dv[u.id] = 1; ch = true; } });
     if (G.startSu) suReq().forEach(u => { if (!G.su[u.id]) { G.su[u.id] = 1; ch = true; } });
     if (ch) recalc();
   }
+  // 계승된 기억: 보유 중인데 이번 신화 회귀 사이클 누적 성흔이 10 미만이면 부족분을 즉시 지급 (자동 지급·옛 저장 포함)
+  if (G.dv.d1 && G.totSig < 10) { const lack = 10 - G.totSig; G.sig += lack; G.totSig += lack; }
   if (G.startAB || G.startC) {   // 영속의 별자리(A·B) / 천상의 문(C): 완성 상태로 시작
     let changed = false;
     const keys = [...(G.startAB ? ['A', 'B'] : []), ...(G.startC ? ['C'] : [])];
@@ -1488,7 +1504,8 @@ function recalc(noCons) {
   if (T !== 'cosmos') for (const id in G.av)  { const u=AUPG.find(x=>x.id===id); if(u) u.e(G); }
   if (T !== 'astra') {
     G.freeLv = G.su.s24 ? (G.suRepeat ? suLv('s24') : 1) : 0;
-    for (const id in G.su)  { const u=SUPG.find(x=>x.id===id); if(u) { const lv = (G.suRepeat ? suLv(id) : 1) + (id === 's24' ? 0 : G.freeLv); for (let k = 0; k < lv; k++) u.e(G); } }
+    for (const id in G.su)  { const u=SUPG.find(x=>x.id===id); if(u) { const lv = (G.suRepeat ? suLv(id) : 1) + (id === 's24' ? 0 : G.freeLv); for (let k = 0; k < lv; k++) { if (k === 0) u.e(G); else applyPartial(u, G, SU_LV_F); } } }
+    for (const k of SU_INT) G[k] = Math.floor(G[k] + 1e-9);
   }
   if (T !== 'solar') for (const id in G.dv)  { const u=DUPG.find(x=>x.id===id); if(u) u.e(G); }
   if (T !== 'chaos') for (const id in G.up)  { const u=UPG.find(x=>x.id===id);  if(u) { for (let k = 0; k <= G.upRep; k++) u.e(G); } }
@@ -1524,8 +1541,10 @@ const prod  = () => { const dl = dynLog(); let t = D0(); for (let i = 0; i < NB;
   return Decimal.pow10(L); };
 const ucost = u => Math.ceil(u.cost * G.ucd);
 const scost = u => Math.max(1, Math.ceil(u.cs * G.suDisc));
-// 신화 회귀: 누적 성흔 100 이상, 신격 = ∛(누적 성흔 ÷ 100)
-const dgain = () => G.totSig >= 100 ? Math.floor(Math.cbrt(G.totSig / 100) * G.dm) : 0;
+// 신화 회귀: 누적 성흔 divReq() 이상, 신격 = ∛(누적 성흔 ÷ 100)
+// 신화 회귀 최소 누적 성흔: 100 × (1 + 누적 신격)
+const divReq = () => Math.floor(100 * (1 + G.totDiv));
+const dgain = () => G.totSig >= divReq() ? Math.floor(Math.cbrt(G.totSig / 100) * G.dm) : 0;
 const clk   = () => { let c = Decimal.pow10(LG(G.cm) + LG(G.gm) + G.xlog + G.clog + (G.divPow ? 2 * LG(1 + G.totDiv) : 0)); if (G.cpp) c = c.add(prod().mul(G.cpp)); return Decimal.max(c, .1); };
 // 업그레이드 가격: 1.8e308을 넘으면 지수가 급격히(2차 함수로) 커짐
 const COST_INF = 308;
@@ -1535,7 +1554,9 @@ const rawCost = (i, n) => LG(BLD[i].base * G.cd) + n * LG(G.cg);
 const bcost = i => Decimal.pow10(softCost(rawCost(i, G.b[i]))).floor();
 // 성흔 = log10(최대 별빛) ÷ 4 − 0.5 (내림)
 const sigBase = (mx, div = G.pdiv) => mx.gte(1) ? Math.max(0, Math.floor(mx.log10() / div - 0.5 + 1e-9)) : 0;
-const pgain = () => { const base = sigBase(G.mx); return base < 1 ? 0 : Math.floor((base + G.pa) * G.pm); };
+// 성좌 소멸 최소 최대 별빛: (기본 기준) × (1 + 누적 성흔)
+const prstReq = () => Decimal.pow10(1.5 * G.pdiv).mul(1 + G.totSig);
+const pgain = () => { const base = sigBase(G.mx); return (base < 1 || G.mx.lt(prstReq())) ? 0 : Math.floor((base + G.pa) * G.pm); };
 // 환생: 무한(1.79e308) 이상에서 가능, 영겁 = (log10(총 획득) ÷ 308)²
 const aeBase = () => G.tot.gte(INF) ? Math.floor(Math.pow(G.tot.log10() / 308, 2)) : 0;
 const aeGain = () => Math.floor(aeBase() * G.aem);
@@ -1610,7 +1631,7 @@ function doPrestige(force) {
   G.sig += g; G.totSig += g; G.pc++;
   const keep = {}; if (G.keepA) CONST[0].ids.forEach(id => { if (G.up[id]) keep[id] = 1; });
   G.sl=D0(); G.tot=D0(); G.mx=D0(); G.runT=0; G.b=Z6(); G.gen=D6(); G.up=keep;
-  recalc(); applyStartBuildings(); notify('✨ 성좌 소멸! 성흔 +'+g+' 획득'); rebuildUpgrades(); updateBuildings();
+  recalc(); applyStartBuildings(); notify('✨ 성좌 소멸! 성흔 +'+fmt(g)+' 획득'); rebuildUpgrades(); updateBuildings();
 }
 
 // ── 핵심 수정: 이벤트 위임 ─────────────
@@ -1716,7 +1737,7 @@ function doDivinity(force) {
   recalc(); applyStartBuildings();
   lastMI = -1; document.getElementById('mythBox').style.display = 'none';
   const f = document.createElement('div'); f.className = 'div-flash'; document.body.appendChild(f); setTimeout(() => f.remove(), 1600);
-  notify('✧ 신화 회귀! 신격 +' + g + ' 획득'); rebuildUpgrades(); updateBuildings(); doSave();
+  notify('✧ 신화 회귀! 신격 +' + fmt(g) + ' 획득'); rebuildUpgrades(); updateBuildings(); doSave();
 }
 
 function buyBuilding(i) {
@@ -2343,8 +2364,8 @@ function render() {
 
   const pb = document.getElementById('prstBtn');
   const pg2 = document.getElementById('prstGain');
-  if (pg > 0) { pb.disabled = false; pg2.textContent = '성흔 +'+pg+' 획득'; }
-  else        { pb.disabled = true;  pg2.textContent = '최대 별빛 '+fmt(1e6)+' 필요 (현재 '+fmt(G.mx)+')'; }
+  if (pg > 0) { pb.disabled = false; pg2.textContent = '성흔 +'+fmt(pg)+' 획득'; }
+  else        { pb.disabled = true;  pg2.textContent = '최대 별빛 '+fmt(prstReq())+' 필요 (현재 '+fmt(G.mx)+')'; }
 
   const infBox = document.getElementById('infBox');
   infBox.hidden = !(DUPG.every(u => G.dv[u.id]) || G.ended1);
@@ -2410,7 +2431,7 @@ function render() {
     document.getElementById('divNum').textContent = fmt(G.div);
     document.getElementById('divSub').textContent = '누적 획득 ' + fmt(G.totDiv);
     document.getElementById('divBtn').disabled = dg <= 0;
-    document.getElementById('divGain').textContent = dg > 0 ? '신격 +' + fmt(dg) + ' 획득' : '누적 성흔 100 필요 (현재 ' + fmt(G.totSig) + ')';
+    document.getElementById('divGain').textContent = dg > 0 ? '신격 +' + fmt(dg) + ' 획득' : '누적 성흔 ' + fmt(divReq()) + ' 필요 (현재 ' + fmt(G.totSig) + ')';
   }
 
   document.getElementById('maxBuyBtn').hidden = !hasMaxBuy();
@@ -2478,11 +2499,15 @@ function crTick(dt) {                                          // step()에서 �
   G.cr.rollT += dt;
   if (G.cr.rollT >= 600) { G.cr.rollT = 0; G.cr.roll = Math.random(); if (G.cr.slots.some(sl => sl.god && sl.stars.some(st => st.t === 'chaos'))) { recalc(); notify('🌀 혼돈이 요동친다: 혼돈의 별 배율 ' + Math.round(G.cr.roll * 100) + '%'); } }
   if (G.guardCd > 0) G.guardCd = Math.max(0, G.guardCd - dt);
+  // 호의·공물 쿨타임은 게임 속도와 무관하게 실제 시간 기준
+  const rdt = dt / Math.max(1, G.spd);
+  const oc = G.cr.offCd || (G.cr.offCd = {});
+  for (const k in oc) { oc[k] = Math.max(0, oc[k] - rdt); if (!oc[k]) delete oc[k]; }
   let lvUp = false;
   G.cr.slots.forEach(sl => {
     if (!sl.god) return;
     const f = G.fav[sl.god]; if (f.lv >= FAV_MAX) return;
-    f.xp += slotFavorRate(sl) * dt;
+    f.xp += slotFavorRate(sl) * rdt;
     while (f.lv < FAV_MAX && f.xp >= xpNeed(f.lv)) { f.xp -= xpNeed(f.lv); f.lv++; lvUp = true; onFavorLevel(sl.god, f.lv); }
     if (f.lv >= FAV_MAX) f.xp = 0;
   });
@@ -2520,8 +2545,8 @@ function renderGenesis() {
       <div class="gg-sub">${f.lv >= FAV_MAX ? '신격화 완료' : fmt(f.xp) + ' / ' + fmt(need)} · 초당 +${fmtRate(rate)}</div>
       <div class="gg-bless">축복: ${g.bless} (레벨마다)</div>
       <div class="gg-btns">
-        <button data-offer="sig" data-god="${g.id}" title="보유 성흔을 모두 바쳐 호의를 얻습니다">공물: 성흔</button>
-        <button data-offer="div" data-god="${g.id}" title="보유 신격을 모두 바쳐 호의를 얻습니다">공물: 신격</button>
+        <button data-offer="sig" data-god="${g.id}" title="보유 성흔을 모두 바쳐 호의를 얻습니다 (이번 레벨 필요량의 20%까지 · 10분 쿨타임)" ${(G.cr.offCd||{})[g.id] ? 'disabled' : ''}>공물: 성흔${(G.cr.offCd||{})[g.id] ? ' (' + fmtCd(G.cr.offCd[g.id]) + ')' : ''}</button>
+        <button data-offer="div" data-god="${g.id}" title="보유 신격을 모두 바쳐 호의를 얻습니다 (이번 레벨 필요량의 20%까지 · 10분 쿨타임)" ${(G.cr.offCd||{})[g.id] ? 'disabled' : ''}>공물: 신격${(G.cr.offCd||{})[g.id] ? ' (' + fmtCd(G.cr.offCd[g.id]) + ')' : ''}</button>
         <button data-guard="${g.id}" ${canGuard ? '' : 'disabled'} title="${g.guard}">${isGuard ? '수호신 해제' : '수호신'}</button>
       </div>
       <div class="gg-guard">${canGuard ? '수호신 능력: ' + g.guard : 'Lv.5에 수호신 능력 해금'}</div>
@@ -2609,8 +2634,12 @@ function genClick(e) {
   else if (b.dataset.ded != null) { sl.god = b.dataset.ded || null; sl.since = G.playT; recalc(); checkAch(); }
   else if (b.dataset.offer) {
     const id = b.dataset.god;
-    if (b.dataset.offer === 'sig') { if (G.sig < 1) { notify('바칠 성흔이 없습니다'); return; } const xp = 20 * Math.pow(LG(1 + G.sig), 1.5); G.sig = 0; addFavor(id, xp); notify('⚝ 성흔을 바쳤습니다 · 호의 +' + fmt(xp)); }
-    else { if (G.div < 1) { notify('바칠 신격이 없습니다'); return; } const xp = 60 * Math.pow(LG(1 + G.div), 1.5); G.div = 0; addFavor(id, xp); notify('✧ 신격을 바쳤습니다 · 호의 +' + fmt(xp)); }
+    const oc = G.cr.offCd || (G.cr.offCd = {});
+    if (oc[id] > 0) { notify('이 신에게 다시 공물을 바치려면 ' + fmtCd(oc[id]) + ' 남았습니다'); return; }
+    if (G.fav[id].lv >= FAV_MAX) return;
+    const cap = xpNeed(G.fav[id].lv) * OFFER_CAP;
+    if (b.dataset.offer === 'sig') { if (G.sig < 1) { notify('바칠 성흔이 없습니다'); return; } const xp = Math.min(cap, 20 * Math.pow(LG(1 + G.sig), 1.5)); G.sig = 0; addFavor(id, xp); oc[id] = OFFER_CD; notify('⚝ 성흔을 바쳤습니다 · 호의 +' + fmt(xp)); }
+    else { if (G.div < 1) { notify('바칠 신격이 없습니다'); return; } const xp = Math.min(cap, 60 * Math.pow(LG(1 + G.div), 1.5)); G.div = 0; addFavor(id, xp); oc[id] = OFFER_CD; notify('✧ 신격을 바쳤습니다 · 호의 +' + fmt(xp)); }
     rebuildUpgrades();
   }
   else if (b.dataset.guard) {
@@ -2655,7 +2684,7 @@ function startTrial(id) {
   if (G.trial) return;
   const t = TRIALS.find(x => x.id === id); if (!t) return;
   const snap = JSON.stringify(getSaveData());
-  G = Object.assign(freshState(), persistKeep(), { trial: id, trialSnap: snap });
+  G = Object.assign(freshState(), persistKeep(), { sig: G.sig, totSig: G.totSig, div: G.div, totDiv: G.totDiv, dv: G.dv, su: G.su, suLv: G.suLv, pc: G.pc }, { trial: id, trialSnap: snap });
   _trialEnding = false;
   recalc(); applyStartBuildings(); applyStartBuildings();
   lastMI = -1; document.getElementById('mythBox').style.display = 'none';
@@ -2796,7 +2825,7 @@ window.addEventListener('resize', () => rebuildUpgrades());
 })();
 
 // ── INIT ─────────────────────────────
-loadSave(); recalc(); initBuildings(); rebuildUpgrades();
+loadSave(); recalc(); applyStartBuildings(); initBuildings(); rebuildUpgrades();
 try { if (localStorage.getItem('sm_debug') === '1') setDebug(true); } catch(e) {}
 checkAch(); updateAchBadge(); applyFold();
 tick();
