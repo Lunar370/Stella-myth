@@ -1068,52 +1068,61 @@ const DUPG = [
     e:s=>{ s.spd*=2; s.heraUncap=true; }, info:()=>`게임 속도 <b>×2</b> · 헤라의 인내 <b>상한 없음</b>` },
   { id:'d5', name:'성흔의 결정',   icon:'💎', dc:15, desc:'성좌 소멸 시 성흔 획득 ×5',
     e:s=>s.pm*=5 },
-  { id:'d6', name:'불멸의 성좌',   icon:'🔱', dc:100, desc:'신화 회귀해도 성흔 소환이 유지됨',
+  { id:'d6', name:'불멸의 성좌',   icon:'🔱', dc:50, desc:'신화 회귀해도 성흔 소환이 유지됨',
     e:s=>s.keepSu=true, info:()=>`성흔 소환 <b>유지</b>` },
-  { id:'d7', name:'창세의 불꽃',   icon:'🔥', dc:150, desc:'성좌 소멸 시 성흔 획득 ×3 · 신화 회귀 시 신격 획득 ×2',
+  { id:'d7', name:'창세의 불꽃',   icon:'🔥', dc:75, desc:'성좌 소멸 시 성흔 획득 ×3 · 신화 회귀 시 신격 획득 ×2',
     e:s=>{ s.pm*=3; s.dm*=2; }, info:()=>`성흔 <b>×3</b> · 신격 <b>×2</b>` },
-  { id:'d8', name:'성흔의 공명',   icon:'🌟', dc:1000, desc:'누적 성흔 수에 따라 모든 생산 증폭: ×(1 + 누적 성흔)³',
+  { id:'d8', name:'성흔의 공명',   icon:'🌟', dc:250, desc:'누적 성흔 수에 따라 모든 생산 증폭: ×(1 + 누적 성흔)³',
     e:s=>s.sigAmp=true, info:()=>`누적 성흔 ${fmt(G.totSig)} → 생산 <b>×${fmtMult(Math.pow(1 + G.totSig, 3 * G.ampPow))}</b>` },
-  { id:'d9', name:'신격의 공명',   icon:'💠', dc:1500, desc:'누적 신격 수에 따라 모든 생산 증폭: ×(1 + 누적 신격)⁵',
+  { id:'d9', name:'신격의 공명',   icon:'💠', dc:375, desc:'누적 신격 수에 따라 모든 생산 증폭: ×(1 + 누적 신격)⁵',
     e:s=>s.divAmp=true, info:()=>`누적 신격 ${fmt(G.totDiv)} → 생산 <b>×${fmtMult(Math.pow(1 + G.totDiv, 5 * G.ampPow))}</b>` },
   // ── 6단계 ──
-  { id:'d10', name:'창조의 권능',   icon:'🌋', dc:10000,  desc:'모든 생산 ×1e20',
+  { id:'d10', name:'창조의 권능',   icon:'🌋', dc:1250,  desc:'모든 생산 ×1e20',
     e:s=>s.gm*=1e20 },
-  { id:'d11', name:'시간 왜곡',     icon:'🌀', dc:15000,  desc:'게임 속도 ×3 · 신화 회귀 시 신격 획득 ×5',
+  { id:'d11', name:'시간 왜곡',     icon:'🌀', dc:1875,  desc:'게임 속도 ×3 · 신화 회귀 시 신격 획득 ×5',
     e:s=>{ s.spd*=3; s.dm*=5; }, info:()=>`게임 속도 <b>×3</b> · 신격 <b>×5</b>` },
-  { id:'d12', name:'별빛의 폭주',   icon:'☄️', dc:20000,  desc:'초당 생산량을 1.05제곱',
+  { id:'d12', name:'별빛의 폭주',   icon:'☄️', dc:2500,  desc:'초당 생산량을 1.05제곱',
     e:s=>s.prodExp*=1.05, info:()=>`초당 생산 ^<b>1.05</b>` },
   // ── 7단계 ──
-  { id:'d13', name:'태초의 이름',   icon:'📛', dc:100000, desc:'성흔의 공명 · 신격의 공명 효과를 1.3제곱',
+  { id:'d13', name:'태초의 이름',   icon:'📛', dc:6250, desc:'성흔의 공명 · 신격의 공명 효과를 1.3제곱',
     e:s=>s.ampPow*=1.3, info:()=>`공명 지수 ×<b>1.3</b> (³ → ³·⁹, ⁵ → ⁶·⁵)` },
-  { id:'d14', name:'우주의 심장',   icon:'🫀', dc:150000, desc:'초당 생산량을 추가로 1.05제곱 · 이번 회차 실제 경과 1분마다 지수 +0.012',
+  { id:'d14', name:'우주의 심장',   icon:'🫀', dc:9375, desc:'초당 생산량을 추가로 1.05제곱 · 이번 회차 실제 경과 1분마다 지수 +0.012',
     e:s=>{ s.prodExp*=1.05; s.heart=true; }, info:()=>`현재 생산 지수 ^<b>${prodExpNow().toFixed(3)}</b>` },
   // ── 8단계 (시련 해금 후) ──
-  { id:'d15', name:'신들의 연회',   icon:'🍷', dc:10000000,  tr:true, desc:'신격의 공명 지수 +5',
+  { id:'d15', name:'신들의 연회',   icon:'🍷', dc:156250,  tr:true, desc:'신격의 공명 지수 +5',
     e:s=>s.divAmpAdd+=5, info:()=>`신격의 공명 지수 <b>+5</b>` },
-  { id:'d16', name:'영원한 제단',   icon:'🗿', dc:15000000,  tr:true, desc:'모든 생산 ×1e100',
+  { id:'d16', name:'영원한 제단',   icon:'🗿', dc:234375,  tr:true, desc:'모든 생산 ×1e100',
     e:s=>s.xlog+=100, info:()=>`모든 생산 <b>×1e100</b>` },
-  { id:'d17', name:'황금 사슬',     icon:'⛓️', dc:20000000, tr:true, desc:'신화 회귀 시 신격 획득 ×100',
+  { id:'d17', name:'황금 사슬',     icon:'⛓️', dc:312500, tr:true, desc:'신화 회귀 시 신격 획득 ×100',
     e:s=>s.dm*=100 },
+  // ── 추가 권능: 1~2단계 강화 ──
+  { id:'d25', name:'올림포스의 축복', icon:'🌩️', dc:1, desc:'모든 생산 ×100,000 · 업그레이드 가격이 1e25를 넘으면 가격 상승 속도 40% 완화',
+    e:s=>{ s.gm*=1e5; s.olymEase=true; }, info:()=>`모든 생산 <b>×100,000</b> · 1e25 이후 가격 상승 <b>×0.6</b>` },
+  { id:'d26', name:'성흔의 원천',     icon:'💫', dc:1, desc:'성좌 소멸 시 성흔 획득 ×10',
+    e:s=>s.pm*=10, info:()=>`성흔 획득 <b>×10</b>` },
+  { id:'d27', name:'신들의 가호',     icon:'🛡️', dc:3, desc:'신화 저항 폭 ×3 (조건을 넘어도 생산이 덜 둔해짐)',
+    e:s=>s.resistMul*=3, info:()=>`저항 폭 ${(resistW() / 3).toFixed(1)} → <b>${resistW().toFixed(1)}</b>` },
+  { id:'d28', name:'회귀의 잔향',     icon:'🔔', dc:4, desc:'성좌 소멸 기준 상승폭 절반 (누적 성흔 자릿수당 ×5 → ×2.24)',
+    e:s=>s.prkMul*=0.5, info:()=>`누적 성흔 자릿수당 기준 <b>×${Math.pow(PR_MUL, G.prkMul).toFixed(2)}</b>` },
   // ── 추가 권능: 이정표 · 흐름 ──
   { id:'d22', name:'별자리의 합창', icon:'🎼', dc:20,   desc:'업그레이드 이정표 배수 ×2 → ×3',
     e:s=>s.mileMul=Math.max(s.mileMul, 3), info:()=>`${G.mile}개마다 <b>×${mileEff().toFixed(2)}</b> (가격 상승률에 따라 제한)` },
-  { id:'d23', name:'흐르는 시간',   icon:'🌊', dc:200,  desc:'별빛의 흐름 강화: 실제 1분마다 ×1.1 → ×1.25',
+  { id:'d23', name:'흐르는 시간',   icon:'🌊', dc:100,  desc:'별빛의 흐름 강화: 실제 1분마다 ×1.1 → ×1.25',
     e:s=>s.flowR=Math.max(s.flowR, 1.25), info:()=>`현재 흐름 <b>×${fmtMult(Decimal.pow10(flowMin() * LG(G.flowR)))}</b> (${Math.floor(flowMin())}분)` },
-  { id:'d24', name:'열 개의 별',    icon:'🔟', dc:30000, desc:'업그레이드 이정표 기준이 10개마다로 줄어듦',
+  { id:'d24', name:'열 개의 별',    icon:'🔟', dc:3750, desc:'업그레이드 이정표 기준이 10개마다로 줄어듦',
     e:s=>s.mile=Math.min(s.mile, 10), info:()=>`<b>${G.mile}개</b>마다 ×${mileEff().toFixed(2)}` },
   // ── 자동화 (시련 해금 후) · 조건은 설정(⚙)에서 ──
-  { id:'d18', name:'자동 성흔',       icon:'🌠', dc:1000000,  tr:true, desc:'조건을 만족하면 자동으로 성좌 소멸 (설정에서 조건 지정)',
+  { id:'d18', name:'자동 성흔',       icon:'🌠', dc:31250,  tr:true, desc:'조건을 만족하면 자동으로 성좌 소멸 (설정에서 조건 지정)',
     e:s=>s.autoP=true, info:()=>`자동 성좌 소멸 · 설정(⚙)에서 조건 지정` },
-  { id:'d19', name:'자동 신격',       icon:'🔮', dc:1500000,  tr:true, desc:'조건을 만족하면 자동으로 신화 회귀 (설정에서 조건 지정)',
+  { id:'d19', name:'자동 신격',       icon:'🔮', dc:46875,  tr:true, desc:'조건을 만족하면 자동으로 신화 회귀 (설정에서 조건 지정)',
     e:s=>s.autoD=true, info:()=>`자동 신화 회귀 · 설정(⚙)에서 조건 지정` },
-  { id:'d20', name:'자동 성흔 레벨업', icon:'📈', dc:2000000, tr:true, desc:'성흔 소환 레벨 강화를 자동으로 진행 (설정에서 성흔 사용 한도 지정)',
+  { id:'d20', name:'자동 성흔 레벨업', icon:'📈', dc:62500, tr:true, desc:'성흔 소환 레벨 강화를 자동으로 진행 (설정에서 성흔 사용 한도 지정)',
     e:s=>s.autoL=true, info:()=>`자동 성흔 소환 레벨 강화 · 설정(⚙)에서 한도 지정` },
-  { id:'d21', name:'자동 영겁',       icon:'♾️', dc:3000000, tr:true, desc:'조건을 만족하면 자동으로 환생 (설정에서 조건 지정)',
+  { id:'d21', name:'자동 영겁',       icon:'♾️', dc:93750, tr:true, desc:'조건을 만족하면 자동으로 환생 (설정에서 조건 지정)',
     e:s=>s.autoR=true, info:()=>`자동 환생 · 설정(⚙)에서 조건 지정` },
 ].map(u => ({ ...u, r: s => s.totDiv >= 1 && (!u.tr || s.trialsOpen) && DUPG_TIERS.slice(0, DUPG_TIERS.findIndex(t => t.includes(u.id))).flat().every(id => s.dv[id]) }));
 // 신격 권능 단계: 현재 단계를 전부 사야 다음 단계가 보임
-const DUPG_TIERS = [['d0'], ['d1','d2','d3'], ['d4','d5','d22'], ['d6','d7','d23'], ['d8','d9'], ['d10','d11','d12','d24'], ['d13','d14'], ['d18','d19','d20','d21'], ['d15','d16','d17']];
+const DUPG_TIERS = [['d0','d1','d25','d26'], ['d2','d3','d27','d28'], ['d4','d5','d22'], ['d6','d7','d23'], ['d8','d9'], ['d10','d11','d12','d24'], ['d13','d14'], ['d18','d19','d20','d21'], ['d15','d16','d17']];
 
 // ── 영겁 권능 (3차 프레스티지 · 환생) ──
 // 신화 회귀·시작 보유 등에서 쓰는 '현재 필요한 성흔 소환' (무한의 성좌는 해금했을 때만 포함)
@@ -1505,7 +1514,7 @@ function freshState() {
   return {
     sl:D0(), tot:D0(), mx:D0(), sig:0, totSig:0, div:0, totDiv:0, dc:0, runT:0, playT:0, ended1:false, endings:0,
     ae:0, totAe:0, av:{}, rc:0,
-    abOn:true, abInt:1, abMode:'max', abSkip:{}, auto:freshAuto(), tDiv:0, dvL:0, pcC:0,
+    abOn:true, abInt:1, abMode:'max', abSkip:{}, auto:freshAuto(), tDiv:0, dvL:0, pcC:0, sigAll:0,
     ach:{}, clicks:0, bestL:0,
     trial:null, trialSnap:null, trialDone:{}, trialsOpen:false,
     genesis:false, cr:freshCreation(), fav:freshFavor(), guard:null, guardCd:0, ended2:false,
@@ -1522,7 +1531,7 @@ function getSaveData() {
     sl:G.sl.toString(), tot:G.tot.toString(), mx:G.mx.toString(), gen:G.gen.map(x => x.toString()), sig:G.sig, totSig:G.totSig,
     b:G.b, up:G.up, su:G.su, pc:G.pc, div:G.div, totDiv:G.totDiv, dv:G.dv, dc:G.dc, runT:G.runT,
     playT:G.playT, ended1:G.ended1, endings:G.endings, ae:G.ae, totAe:G.totAe, av:G.av, rc:G.rc, suLv:G.suLv,
-    abOn:G.abOn, abInt:G.abInt, abMode:G.abMode, abSkip:G.abSkip, auto:G.auto, tDiv:G.tDiv, dvL:G.dvL, pcC:G.pcC, ach:G.ach, clicks:G.clicks, bestL:G.bestL,
+    abOn:G.abOn, abInt:G.abInt, abMode:G.abMode, abSkip:G.abSkip, auto:G.auto, tDiv:G.tDiv, dvL:G.dvL, pcC:G.pcC, sigAll:G.sigAll, ach:G.ach, clicks:G.clicks, bestL:G.bestL,
     trial:G.trial, trialSnap:G.trialSnap, trialDone:G.trialDone, trialsOpen:G.trialsOpen,
     genesis:G.genesis, cr:G.cr, fav:G.fav, guard:G.guard, guardCd:G.guardCd, ended2:G.ended2 };
 }
@@ -1537,7 +1546,7 @@ function normalizeSave(d) {
   if (!g.suLv || typeof g.suLv !== 'object') g.suLv = {};
   if (!g.abSkip || typeof g.abSkip !== 'object') g.abSkip = {};
   { const fa = freshAuto(), a = (g.auto && typeof g.auto === 'object') ? g.auto : {}; for (const k in fa) fa[k] = Object.assign(fa[k], a[k] || {}); g.auto = fa; }
-  g.tDiv = +g.tDiv || 0; g.dvL = +g.dvL || 0; g.pcC = +g.pcC || 0;
+  g.tDiv = +g.tDiv || 0; g.dvL = +g.dvL || 0; g.pcC = +g.pcC || 0; g.sigAll = +g.sigAll || 0;
   if (!g.ach || typeof g.ach !== 'object') g.ach = {};
   if (!g.trialDone || typeof g.trialDone !== 'object') g.trialDone = {};
   if (g.av && g.av.a10) g.trialsOpen = true;
@@ -1611,7 +1620,7 @@ function recalc(noCons) {
   G.bm=BLD.map(() => 1); G.gm=1; G.cm=1; G.cpp=0; G.sb=0; G.cd=1; G.pm=1;
   G.startB=false; G.gens=[]; G.res=0; G.cg=1.15; G.ucd=1; G.pa=0; G.pdiv=4;
   G.interestM=1; G.timeB=false; G.mythB=false; G.twin=0; G.meteorB=0; G.mile=25; G.mileMul=2; G.flowR=1.1; G.resAll=0; G.upRep=0; G.heraRate=1; G.mythM=1; G.divPow=false; G.startAB=false; G.startC=false; G.sigTick=0; G.sigAmp=false; G.divAmp=false; G.prodExp=1; G.ampPow=1; G.heart=false; G.heraUncap=false;
-  G.dm=1; G.spd=1; G.keepA=false; G.keepSu=false; G.startSig=0; G.autoBuy=false; G.autoP=false; G.autoD=false; G.autoL=false; G.autoR=false; G.suDisc=1;
+  G.dm=1; G.spd=1; G.resistMul=1; G.prkMul=1; G.olymEase=false; G.keepA=false; G.keepSu=false; G.startSig=0; G.autoBuy=false; G.autoP=false; G.autoD=false; G.autoL=false; G.autoR=false; G.suDisc=1;
   G.aem=1; G.startDv=0; G.startSu=false; G.suRepeat=false; G.bldPlus=false; G.consD=false; G.suPlus=false;
   G.xlog=0; G.texp=0; G.costEase=false; G.divAmpAdd=0; G.freeLv=0; G.clog=0;
   const T = G.trial;                                          // 시련 제약
@@ -1658,30 +1667,44 @@ const unitLog = (i, dl = dynLog()) => LG(BLD[i].prod) + LG(G.bm[i]) + LG(G.gm) +
   + Math.floor(G.b[i] / G.mile) * LG(mileEff());            // 기본 이정표: G.mile개마다 ×mileEff (가격 상승보다 커지지 않게 제한)
 const unitProd = (i, dl = dynLog()) => Decimal.pow10(unitLog(i, dl));
 const prodExpNow = () => Math.min(G.totAe > 0 ? 10 : 3, G.prodExp + G.texp + (G.heart ? 0.012 * G.runT / Math.max(1, G.spd) / 60 : 0)) * (G.trial === 'hera' ? .5 : 1);
+// 신화 저항: 초당 생산 자릿수가 신화 회귀 조건 자릿수를 넘으면 넘은 부분이 로그로 눌림
+//   L' = 조건 + W × ln(1 + 초과 ÷ W),  W(저항 폭) = 3 × (1 + log10(1 + 누적 신격))² · 신격 권능(시련 후 권능 제외)을 전부 보유하면 저항 없음  → 신격이 쌓일수록 저항이 약해짐
+const resistW = () => 3 * Math.pow(1 + LG(1 + G.totDiv), 2) * (G.resistMul || 1);
+const resistL = L => { if (DUPG.every(u => u.tr || G.dv[u.id])) return L; const q = divReqStarL(); if (L <= q) return L; const W = resistW(); return q + W * Math.log(1 + (L - q) / W); };
 const prod  = () => { const dl = dynLog(); let t = D0(); for (let i = 0; i < NB; i++) t = t.add(cnt(i).mul(unitProd(i, dl)));
   if (t.lte(1)) return t;
   let L = t.log10() * prodExpNow();                   // 별빛의 폭주 · 우주의 심장 (지수)
+  L = resistL(L);                                      // 신화 저항: 회귀 조건을 넘은 만큼 생산이 둔화
   if (L > 308) L = 308 + Math.sqrt((L - 308) * 308);  // 무한 너머의 저항: 1.8e308 초과분은 지수가 제곱근으로 줄어듦
   return Decimal.pow10(L); };
 const ucost = u => Math.ceil(u.cost * G.ucd);
 const scost = u => Math.max(1, Math.ceil(u.cs * G.suDisc * 0.35));   // 밸런스: 성흔 소환 가격 ×0.35
-// 신화 회귀 조건: 누적 성흔 divReq() 이상 + 이번 신화 회귀 사이클 최고 별빛 1e(DIV_L0) 이상
-// 신격 = 10^((사이클 최고 별빛 자릿수 − DIV_L0) ÷ DIV_D) × 신격 배율 × 10  → 오래 키울수록 기하급수로 증가
-const DIV_REQ0 = 25, DIV_L0 = 25, DIV_D = 10;
-const divReq = () => Math.floor(DIV_REQ0 * (1 + (G.dc || 0)));
-const dgain = () => (G.totSig >= divReq() && G.dvL >= DIV_L0) ? Math.floor(Math.pow(10, (G.dvL - DIV_L0) / DIV_D) * G.dm * 10) : 0;
+// 신화 회귀 조건: 이번 사이클 최고 별빛 1e25 × 5^(log10(1 + 누적 신격)) 이상 → 누적 신격 자릿수마다 ×5
+// 신격 = (여유 자릿수 ÷ 5)³ × 신격 배율 (최소 1), 여유 자릿수 = 최고 별빛 자릿수 − 조건 자릿수 → 처음엔 1~2개, 오래 키울수록 증가
+const DIV_REQ0 = 25, DIV_L0 = 25, DIV_D = 5;
+const DIV_REQ_MUL = 5;
+const DIV_P = 3;
+const divReqStarL = () => DIV_L0 + LG(1 + G.totDiv) * LG(DIV_REQ_MUL);   // 필요 최고 별빛 (log10)
+const divReqOk = () => G.dvL >= divReqStarL() - 1e-9;
+const dgain = () => divReqOk() ? Math.max(1, Math.floor(Math.pow(Math.max(0, G.dvL - divReqStarL()) / DIV_D, DIV_P) * G.dm)) : 0;
 const clk   = () => { let c = Decimal.pow10(LG(G.cm) + LG(G.gm) + G.xlog + G.clog + (G.divPow ? 2 * LG(1 + G.totDiv) : 0)); if (G.cpp) c = c.add(prod().mul(G.cpp)); return Decimal.max(c, .1); };
 // 업그레이드 가격: 1.8e308을 넘으면 지수가 급격히(2차 함수로) 커짐
 const COST_INF = 308;
 const softCost = raw => raw <= COST_INF ? raw : COST_INF + (G.costEase ? 1.5 : 3) * (raw - COST_INF) + (raw - COST_INF) ** 2 / (G.costEase ? 100 : 50);
 const softCostInv = L => { if (L <= COST_INF) return L; const a = 1 / (G.costEase ? 100 : 50), b = G.costEase ? 1.5 : 3; return COST_INF + (-b + Math.sqrt(b * b + 4 * a * (L - COST_INF))) / (2 * a); };
-const rawCost = (i, n) => LG(BLD[i].base * G.cd) + n * LG(G.cg);
+// 올림포스의 축복: 가격이 1e25를 넘은 뒤로는 가격 상승 속도(자릿수 증가)가 EASE_E배로 완화
+const EASE_T = 25;
+const easeE = () => G.olymEase ? 0.6 : 1;
+const easeRaw = r => r <= EASE_T ? r : EASE_T + (r - EASE_T) * easeE();
+const easeInv = L => L <= EASE_T ? L : EASE_T + (L - EASE_T) / easeE();
+const rawBase = (i, n) => LG(BLD[i].base * G.cd) + n * LG(G.cg);            // 완화 전 가격 자릿수
+const rawCost = (i, n) => easeRaw(rawBase(i, n));
 const bcost = i => Decimal.pow10(softCost(rawCost(i, G.b[i]))).floor();
 // 성흔 = log10(최대 별빛) ÷ 4 − 0.5 (내림)
 const sigBase = (mx, div = G.pdiv) => mx.gte(1) ? Math.max(0, Math.floor(mx.log10() / div - 0.5 + 1e-9)) : 0;
-// 성좌 소멸 최소 최대 별빛: (기본 기준) × 10^(PR_K × 누적 소멸 횟수 (환생 시 초기화)) → 소멸할수록 기준이 지수적으로 상승
-const PR_K = 0.25;
-const prstReq = () => Decimal.pow10(1.5 * G.pdiv + PR_K * (G.pcC || 0));
+// 성좌 소멸 최소 최대 별빛: (기본 기준) × 5^(log10(1 + 누적 획득 성흔)) → 누적 성흔 자릿수마다 ×5 (누적 성흔은 환생 시 초기화)
+const PR_MUL = 5;
+const prstReq = () => Decimal.pow10(1.5 * G.pdiv + LG(PR_MUL) * (G.prkMul || 1) * LG(1 + (G.sigAll || 0)));
 const pgain = () => { const base = sigBase(G.mx); return (base < 1 || G.mx.lt(prstReq())) ? 0 : Math.floor((base + G.pa) * G.pm); };
 // 환생: 무한(1.79e308) 이상에서 가능, 영겁 = (log10(총 획득) ÷ 308)² × 40 (첫 환생은 1개)
 const aeBase = () => G.tot.gte(INF) ? Math.floor(Math.pow(G.tot.log10() / 308, 2)) : 0;
@@ -1754,7 +1777,7 @@ document.getElementById('orbWrap').addEventListener('click', e => {
 document.getElementById('prstBtn').addEventListener('click', () => doPrestige());
 function doPrestige(force) {
   const g = Math.max(pgain(), force ? 1 : 0); if (g <= 0) return;
-  G.sig += g; G.totSig += g; G.pc++; G.pcC = (G.pcC || 0) + 1;
+  G.sig += g; G.totSig += g; G.pc++; G.pcC = (G.pcC || 0) + 1; G.sigAll = (G.sigAll || 0) + g;
   const keep = {}; if (G.keepA) CONST[0].ids.forEach(id => { if (G.up[id]) keep[id] = 1; });
   G.sl=D0(); G.tot=D0(); G.mx=D0(); G.runT=0; G.b=Z6(); G.gen=D6(); G.up=keep;
   recalc(); applyStartBuildings(); notify('✨ 성좌 소멸! 성흔 +'+fmt(g)+' 획득'); rebuildUpgrades(); updateBuildings();
@@ -1880,22 +1903,27 @@ function maxBuy(skip = {}) {
     const vis = [];
     for (let i = 0; i < NB; i++) { if (!bldOpen(i) || skip[i]) continue; vis.push({ i, c: bcost(i), per: 1 + (G.twin || 0) }); }
     if (!vis.length) break;
-    vis.forEach(v => { v.step = v.per * LG(G.cg); v.raw0 = rawCost(v.i, G.b[v.i]); v.lc = softCost(v.raw0); });
+    vis.forEach(v => { v.step = v.per * LG(G.cg); v.u0 = rawBase(v.i, G.b[v.i]); v.raw0 = easeRaw(v.u0); v.lc = softCost(v.raw0); });
     const minC = vis.reduce((m, v) => Math.min(m, v.lc), Infinity);
     if (G.sl.lt(Decimal.pow10(minC))) break;
     // k번 구매 총비용: 1.8e308 이하 구간은 등비수열 합, 넘는 구간은 마지막 가격 기준으로 넉넉하게 계산
     const segCost = (v, k) => {
-      const rawLast = v.raw0 + (k - 1) * v.step;
-      const geo = (r0, n) => Decimal.pow10(r0).mul(Decimal.pow10(n * v.step).sub(1)).div(Math.pow(10, v.step) - 1);
-      if (rawLast <= COST_INF) return geo(v.raw0, k);
-      const kg = v.raw0 > COST_INF ? 0 : Math.min(k, Math.floor((COST_INF - v.raw0) / v.step) + 1);
-      const rs = v.raw0 + kg * v.step, d = softCost(rs + v.step) - softCost(rs);
+      const rawAt = j => easeRaw(v.u0 + j * v.step);            // j번째 구매 가격 자릿수 (완화 반영)
+      const rawLast = rawAt(k - 1);
+      const geo1 = (r0, n, st) => n <= 0 ? D0() : Decimal.pow10(r0).mul(Decimal.pow10(n * st).sub(1)).div(Math.pow(10, st) - 1);
+      const geo = (j0, n) => {                                  // j0번째부터 n개 합 (완화 경계에서 두 구간으로 나눔)
+        const jT = Math.max(j0, Math.min(j0 + n, Math.ceil((EASE_T - v.u0) / v.step - 1e-9)));
+        return geo1(rawAt(j0), jT - j0, v.step).add(geo1(rawAt(jT), j0 + n - jT, v.step * easeE()));
+      };
+      if (rawLast <= COST_INF) return geo(0, k);
+      const kg = v.raw0 > COST_INF ? 0 : Math.min(k, Math.floor((easeInv(COST_INF) - v.u0) / v.step) + 1);
+      const rs = rawAt(kg), d = softCost(rawAt(kg + 1)) - softCost(rs);
       const sup = Decimal.pow10(softCost(rawLast)).mul(d > 15 ? 1 : Math.pow(10, d) / (Math.pow(10, d) - 1));
-      return kg > 0 ? geo(v.raw0, kg).add(sup) : sup;
+      return kg > 0 ? geo(0, kg).add(sup) : sup;
     };
     const plan = lp => vis.map(v => {           // 가격 10^lp 이하로 살 수 있는 개수와 비용
       if (lp < v.lc) return { v, k: 0, cost: D0() };
-      const k = Math.floor((softCostInv(lp) - v.raw0) / v.step + 1e-9) + 1;
+      const k = Math.floor((easeInv(softCostInv(lp)) - v.u0) / v.step + 1e-9) + 1;
       return { v, k, cost: segCost(v, k) };
     });
     const total = pl => pl.reduce((t, x) => t.add(x.cost), D0());
@@ -2498,7 +2526,7 @@ function render() {
   const pr = prod(), cl = clk(), pg = pgain(), sm = smult();
 
   document.getElementById('slNum').textContent   = fmt(G.sl);
-  document.getElementById('slRate').textContent  = '초당 +' + fmtRate(pr) + (flowMin() >= 1 ? ' · 흐름 ×' + fmtMult(Decimal.pow10(flowMin() * LG(G.flowR))) : '');
+  document.getElementById('slRate').textContent  = '초당 +' + fmtRate(pr) + (flowMin() >= 1 ? ' · 흐름 ×' + fmtMult(Decimal.pow10(flowMin() * LG(G.flowR))) : '') + (pr.gte(1) && pr.log10() > divReqStarL() + 0.05 ? ' · 신화 저항' : '');
   document.getElementById('cpLbl').textContent   = fmt(cl);
   document.getElementById('sgNum').textContent   = fmt(G.sig);
   document.getElementById('sgMult').textContent  = '누적 획득 ' + fmt(G.totSig);
@@ -2572,7 +2600,7 @@ function render() {
     document.getElementById('divNum').textContent = fmt(G.div);
     document.getElementById('divSub').textContent = '누적 획득 ' + fmt(G.totDiv);
     document.getElementById('divBtn').disabled = dg <= 0;
-    document.getElementById('divGain').textContent = dg > 0 ? '신격 +' + fmt(dg) + ' 획득' : (G.totSig < divReq() ? '누적 성흔 ' + fmt(divReq()) + ' 필요 (현재 ' + fmt(G.totSig) + ')' : '이번 사이클 최고 별빛 ' + fmt(Decimal.pow10(DIV_L0)) + ' 필요 (현재 ' + fmt(Decimal.pow10(G.dvL)) + ')');
+    document.getElementById('divGain').textContent = dg > 0 ? '신격 +' + fmt(dg) + ' 획득' : ('이번 사이클 최고 별빛 ' + fmt(Decimal.pow10(divReqStarL())) + ' 필요 (현재 ' + fmt(Decimal.pow10(G.dvL)) + ')');
   }
 
   document.getElementById('maxBuyBtn').hidden = !hasMaxBuy();
